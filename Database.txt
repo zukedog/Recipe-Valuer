@@ -1,0 +1,86 @@
+CREATE TABLE Supplier (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(64) NOT NULL
+);
+
+CREATE TABLE Ingredient (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(64) NOT NULL,
+    defaultSupplier INT,
+    category VARCHAR(64),
+    FOREIGN KEY (defaultSupplier)
+        REFERENCES Supplier(id),
+    UNIQUE (name)
+);
+
+CREATE TABLE Purchase (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    supplierId INT,
+    ingredientId INT,
+    costCents INT,
+    purchaseKg DOUBLE,
+    expired BOOL,
+    dateChanged DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (supplierId)
+        REFERENCES Supplier(id),
+    FOREIGN KEY (ingredientId)
+        REFERENCES Ingredient(id)
+);
+
+CREATE TABLE IngredientUnit (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(64) NOT NULL,
+    ingredientId INT,
+    qtyPerPrimaryUnit INT,
+    FOREIGN KEY (ingredientId)
+        REFERENCES Ingredient(id),
+    CONSTRAINT U_NamePerIngredient
+        UNIQUE (name, ingredientId)
+);
+
+CREATE TABLE Recipe (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(64) NOT NULL,
+    type VARCHAR(64) NOT NULL DEFAULT 'Product,
+    qty INT,
+    UNIQUE (name)
+);
+
+CREATE TABLE RecipeUnit (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(64) NOT NULL,
+    recipeId INT,
+    qtyPerPrimaryUnit INT,
+    FOREIGN KEY (recipeId)
+        REFERENCES Recipe(id)
+    CONSTRAINT U_NamePerRecipe
+        UNIQUE (name, recipeId)
+);
+
+CREATE TABLE SubRecipe (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    recipeID INT,
+    subRecipeId INT,
+    qty INT,
+    unitId INT,
+    FOREIGN KEY (recipeId)
+        REFERENCES Recipe(id)
+    FOREIGN KEY (subRecipeId)
+        REFERENCES Recipe(id)
+    FOREIGN KEY (unitId)
+        REFERENCES RecipeUnit(id)
+);
+
+CREATE TABLE RecipeIngredient (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    recipeID INT,
+    ingredientId INT,
+    qty INT,
+    unitId INT,
+    FOREIGN KEY (recipeId)
+        REFERENCES Recipe(id)
+    FOREIGN KEY (ingredientId)
+        REFERENCES Ingredient(id)
+    FOREIGN KEY (unitId)
+        REFERENCES IngredientUnit(id)
+);
