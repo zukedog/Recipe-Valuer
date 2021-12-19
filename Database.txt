@@ -41,7 +41,7 @@ CREATE TABLE IngredientUnit (
 CREATE TABLE Recipe (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(64) NOT NULL,
-    type VARCHAR(64) NOT NULL DEFAULT 'Product,
+    type VARCHAR(64) NOT NULL DEFAULT 'Product',
     qty INT,
     UNIQUE (name)
 );
@@ -52,7 +52,7 @@ CREATE TABLE RecipeUnit (
     recipeId INT,
     qtyPerPrimaryUnit INT,
     FOREIGN KEY (recipeId)
-        REFERENCES Recipe(id)
+        REFERENCES Recipe(id),
     CONSTRAINT U_NamePerRecipe
         UNIQUE (name, recipeId)
 );
@@ -64,9 +64,9 @@ CREATE TABLE SubRecipe (
     qty INT,
     unitId INT,
     FOREIGN KEY (recipeId)
-        REFERENCES Recipe(id)
+        REFERENCES Recipe(id),
     FOREIGN KEY (subRecipeId)
-        REFERENCES Recipe(id)
+        REFERENCES Recipe(id),
     FOREIGN KEY (unitId)
         REFERENCES RecipeUnit(id)
 );
@@ -78,9 +78,26 @@ CREATE TABLE RecipeIngredient (
     qty INT,
     unitId INT,
     FOREIGN KEY (recipeId)
-        REFERENCES Recipe(id)
+        REFERENCES Recipe(id),
     FOREIGN KEY (ingredientId)
-        REFERENCES Ingredient(id)
+        REFERENCES Ingredient(id),
     FOREIGN KEY (unitId)
         REFERENCES IngredientUnit(id)
 );
+
+
+DROP TABLE RecipeIngredient;
+DROP TABLE SubRecipe;
+DROP TABLE RecipeUnit;
+DROP TABLE Recipe;
+DROP TABLE IngredientUnit;
+DROP TABLE Purchase;
+DROP TABLE Ingredient;
+DROP TABLE Supplier;
+
+-- Add Supplier
+INSERT INTO Supplier(name)
+VALUES("<SUPPLIER NAME>");
+
+-- List Suppliers
+SELECT id, name FROM Supplier;
