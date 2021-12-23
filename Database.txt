@@ -13,6 +13,17 @@ CREATE TABLE Ingredient (
     UNIQUE (name)
 );
 
+CREATE TABLE IngredientUnit (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(64) NOT NULL,
+    ingredientId INT,
+    qtyPerPrimaryUnit INT,
+    FOREIGN KEY (ingredientId)
+        REFERENCES Ingredient(id),
+    CONSTRAINT U_NamePerIngredient
+        UNIQUE (name, ingredientId)
+);
+
 CREATE TABLE Purchase (
     id INT AUTO_INCREMENT PRIMARY KEY,
     supplierId INT,
@@ -25,17 +36,6 @@ CREATE TABLE Purchase (
         REFERENCES Supplier(id),
     FOREIGN KEY (ingredientId)
         REFERENCES Ingredient(id)
-);
-
-CREATE TABLE IngredientUnit (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(64) NOT NULL,
-    ingredientId INT,
-    qtyPerPrimaryUnit INT,
-    FOREIGN KEY (ingredientId)
-        REFERENCES Ingredient(id),
-    CONSTRAINT U_NamePerIngredient
-        UNIQUE (name, ingredientId)
 );
 
 CREATE TABLE Recipe (
@@ -101,3 +101,34 @@ VALUES("<SUPPLIER NAME>");
 
 -- List Suppliers
 SELECT id, name FROM Supplier;
+
+-- Add Ingredient
+INSERT INTO Ingredient(name,defaultSupplier,category)
+VALUES("<INGREDIENT NAME>",<SUPPLIER NUMBER>,"<CATEGORY>");
+
+-- List Ingredients
+SELECT id, name, category
+FROM Ingredient;
+
+-- List Ingredients & Default Supplier
+SELECT Ingredient.id, Ingredient.name, Ingredient.category, Ingredient.defaultSupplier, Supplier.name
+FROM Ingredient LEFT OUTER JOIN Supplier
+ON Ingredient.defaultSupplier=Supplier.id;
+
+-- List Ingredients with Default Supplier (By id)
+SELECT id, name, category
+FROM Ingredient
+WHERE defaultSupplier = <SUPPLIER ID>;
+
+-- List Ingredients with Default Supplier (By name)
+
+SELECT id, name, category
+FROM Ingredient
+WHERE defaultSupplier in (
+    SELECT id
+    FROM Supplier
+    WHERE name = "<SUPPLIER NAME>");
+
+-- Add Supplier
+INSERT INTO (name)
+VALUES("<SUPPLIER NAME>");
