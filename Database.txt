@@ -8,7 +8,7 @@ CREATE TABLE Category (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(64) NOT NULL,
     UNIQUE (name)
-    --Description???
+    -- Description???
     -- Should there be something to keep recipe and product catagories seperate?
 );
 -- Categories for Recipes
@@ -66,7 +66,7 @@ CREATE TABLE Purchase (
     supplierId INT NOT NULL,
     ingredientId INT NOT NULL,
     costCents INT NOT NULL,
-    purchaseQty DOUBLE INT NOT NULL,
+    purchaseQty DOUBLE NOT NULL,
     purchaseUnitsId INT NOT NULL,
     expired BOOL,
     dateChanged DATETIME DEFAULT CURRENT_TIMESTAMP,
