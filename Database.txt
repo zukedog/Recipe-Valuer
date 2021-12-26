@@ -1,68 +1,120 @@
 CREATE TABLE Supplier (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(64) NOT NULL
+    name VARCHAR(64) NOT NULL,
+    UNIQUE (name)
 );
+
+CREATE TABLE Category (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(64) NOT NULL,
+    UNIQUE (name)
+    --Description???
+    -- Should there be something to keep recipe and product catagories seperate?
+);
+-- Categories for Recipes
+INSERT INTO Category(name)
+VALUES("BaseRecipe");
+INSERT INTO Category(name)
+VALUES("SubRecipe");
+INSERT INTO Category(name)
+VALUES("ProductRecipe");
+
+-- Categories for Ingredients
+INSERT INTO Category(name)
+VALUES("Ingredient");
+INSERT INTO Category(name)
+VALUES("Wages");
+INSERT INTO Category(name)
+VALUES("Packaging");
 
 CREATE TABLE Ingredient (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(64) NOT NULL,
-    defaultSupplier INT,
-    category VARCHAR(64),
+    defaultSupplier INT NOT NULL,
+    category INT NOT NULL,
+    FOREIGN KEY (category)
+        REFERENCES Category(id),
     FOREIGN KEY (defaultSupplier)
         REFERENCES Supplier(id),
     UNIQUE (name)
+    -- check defaultSupplier stocks product (Circular Reference??)
+    -- check category allows use for ingredient
 );
 
 CREATE TABLE IngredientUnit (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(64) NOT NULL,
-    ingredientId INT,
-    qtyPerPrimaryUnit INT,
+    ingredientId INT NOT NULL,
+    qtyPerPrimaryUnit INT NOT NULL DEFAULT 1,
     FOREIGN KEY (ingredientId)
         REFERENCES Ingredient(id),
-    CONSTRAINT U_NamePerIngredient
-        UNIQUE (name, ingredientId)
+   UNIQUE (name, ingredientId)
+);
+
+CREATE TABLE DefaultIngredientUnit (
+    ingredientId INT PRIMARY KEY,
+    unitId INT NOT NULL,
+    FOREIGN KEY (ingredientId)
+        REFERENCES Ingredient(id),
+    FOREIGN KEY (unitId)
+        REFERENCES IngredientUnit(id)
+    -- Could put a check or something to make sure unit is for ingredient
 );
 
 CREATE TABLE Purchase (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    supplierId INT,
-    ingredientId INT,
-    costCents INT,
-    purchaseKg DOUBLE,
+    supplierId INT NOT NULL,
+    ingredientId INT NOT NULL,
+    costCents INT NOT NULL,
+    purchaseQty DOUBLE INT NOT NULL,
+    purchaseUnitsId INT NOT NULL,
     expired BOOL,
     dateChanged DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (supplierId)
         REFERENCES Supplier(id),
+    FOREIGN KEY (purchaseUnitsId)
+        REFERENCES IngredientUnit(id),
     FOREIGN KEY (ingredientId)
         REFERENCES Ingredient(id)
+    -- Expiry needs work
 );
 
 CREATE TABLE Recipe (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(64) NOT NULL,
-    type VARCHAR(64) NOT NULL DEFAULT 'Product',
-    qty INT,
+    category INT NOT NULL,
+    qty INT NOT NULL ,
     UNIQUE (name)
+    FOREIGN KEY (category)
+        REFERENCES Category(id)
 );
 
 CREATE TABLE RecipeUnit (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(64) NOT NULL,
-    recipeId INT,
-    qtyPerPrimaryUnit INT,
+    recipeId INT NOT NULL,
+    qtyPerPrimaryUnit INT NOT NULL DEFAULT 1,
     FOREIGN KEY (recipeId)
         REFERENCES Recipe(id),
-    CONSTRAINT U_NamePerRecipe
-        UNIQUE (name, recipeId)
+    UNIQUE (name, recipeId)
+);
+
+CREATE TABLE DefaultRecipeUnit (
+    recipeId INT PRIMARY KEY,
+    unitId INT NOT NULL,
+    FOREIGN KEY (recipeId)
+        REFERENCES Recipe(id),
+    FOREIGN KEY (unitId)
+        REFERENCES RecipeUnit(id)
+        -- Could put a check or something to make sure unit is for Recipe
 );
 
 CREATE TABLE SubRecipe (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    recipeID INT,
-    subRecipeId INT,
-    qty INT,
-    unitId INT,
+    recipeID INT NOT NULL,
+    subRecipeId INT NOT NULL,
+    qty INT NOT NULL,
+    unitId INT NOT NULL,
     FOREIGN KEY (recipeId)
         REFERENCES Recipe(id),
     FOREIGN KEY (subRecipeId)
@@ -73,10 +125,10 @@ CREATE TABLE SubRecipe (
 
 CREATE TABLE RecipeIngredient (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    recipeID INT,
-    ingredientId INT,
-    qty INT,
-    unitId INT,
+    recipeID INT NOT NULL,
+    ingredientId INT NOT NULL,
+    qty INT NOT NULL,
+    unitId INT NOT NULL,
     FOREIGN KEY (recipeId)
         REFERENCES Recipe(id),
     FOREIGN KEY (ingredientId)
@@ -88,12 +140,22 @@ CREATE TABLE RecipeIngredient (
 
 DROP TABLE RecipeIngredient;
 DROP TABLE SubRecipe;
+DROP TABLE DefaultRecipeUnit;
 DROP TABLE RecipeUnit;
 DROP TABLE Recipe;
-DROP TABLE IngredientUnit;
 DROP TABLE Purchase;
+DROP TABLE DefaultIngredientUnit;
+DROP TABLE IngredientUnit;
 DROP TABLE Ingredient;
+DROP TABLE Category;
 DROP TABLE Supplier;
+
+-- Add Category
+INSERT INTO Category(name)
+VALUES("CATEGORY NAME");
+
+-- List Category
+SELECT id, name FROM Category;
 
 -- Add Supplier
 INSERT INTO Supplier(name)
@@ -121,7 +183,6 @@ FROM Ingredient
 WHERE defaultSupplier = <SUPPLIER ID>;
 
 -- List Ingredients with Default Supplier (By name)
-
 SELECT id, name, category
 FROM Ingredient
 WHERE defaultSupplier in (
