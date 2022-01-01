@@ -31,8 +31,8 @@ CREATE TABLE Ingredient (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(64) NOT NULL,
     defaultSupplier INT NOT NULL,
-    category INT NOT NULL,
-    FOREIGN KEY (category)
+    categoryId INT NOT NULL,
+    FOREIGN KEY (categoryId)
         REFERENCES Category(id),
     FOREIGN KEY (defaultSupplier)
         REFERENCES Supplier(id),
@@ -49,6 +49,8 @@ CREATE TABLE IngredientUnit (
     FOREIGN KEY (ingredientId)
         REFERENCES Ingredient(id),
    UNIQUE (name, ingredientId)
+   -- First Added should have qty of 1
+   -- Dont allow a second till Default Chosen
 );
 
 CREATE TABLE DefaultIngredientUnit (
@@ -68,7 +70,7 @@ CREATE TABLE Purchase (
     costCents INT NOT NULL,
     purchaseQty DOUBLE NOT NULL,
     purchaseUnitsId INT NOT NULL,
-    expired BOOL,
+    expired BOOL DEFAULT FALSE,
     dateChanged DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (supplierId)
         REFERENCES Supplier(id),
@@ -82,10 +84,10 @@ CREATE TABLE Purchase (
 CREATE TABLE Recipe (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(64) NOT NULL,
-    category INT NOT NULL,
+    categoryId INT NOT NULL,
     qty INT NOT NULL ,
-    UNIQUE (name)
-    FOREIGN KEY (category)
+    UNIQUE (name),
+    FOREIGN KEY (categoryId)
         REFERENCES Category(id)
 );
 
@@ -97,6 +99,8 @@ CREATE TABLE RecipeUnit (
     FOREIGN KEY (recipeId)
         REFERENCES Recipe(id),
     UNIQUE (name, recipeId)
+   -- First Added should have qty of 1
+   -- Dont allow a second till Default Chosen
 );
 
 CREATE TABLE DefaultRecipeUnit (
@@ -111,7 +115,7 @@ CREATE TABLE DefaultRecipeUnit (
 
 CREATE TABLE SubRecipe (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    recipeID INT NOT NULL,
+    recipeId INT NOT NULL,
     subRecipeId INT NOT NULL,
     qty INT NOT NULL,
     unitId INT NOT NULL,
@@ -125,7 +129,7 @@ CREATE TABLE SubRecipe (
 
 CREATE TABLE RecipeIngredient (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    recipeID INT NOT NULL,
+    recipeId INT NOT NULL,
     ingredientId INT NOT NULL,
     qty INT NOT NULL,
     unitId INT NOT NULL,
@@ -149,47 +153,3 @@ DROP TABLE IngredientUnit;
 DROP TABLE Ingredient;
 DROP TABLE Category;
 DROP TABLE Supplier;
-
--- Add Category
-INSERT INTO Category(name)
-VALUES("CATEGORY NAME");
-
--- List Category
-SELECT id, name FROM Category;
-
--- Add Supplier
-INSERT INTO Supplier(name)
-VALUES("<SUPPLIER NAME>");
-
--- List Suppliers
-SELECT id, name FROM Supplier;
-
--- Add Ingredient
-INSERT INTO Ingredient(name,defaultSupplier,category)
-VALUES("<INGREDIENT NAME>",<SUPPLIER NUMBER>,"<CATEGORY>");
-
--- List Ingredients
-SELECT id, name, category
-FROM Ingredient;
-
--- List Ingredients & Default Supplier
-SELECT Ingredient.id, Ingredient.name, Ingredient.category, Ingredient.defaultSupplier, Supplier.name
-FROM Ingredient LEFT OUTER JOIN Supplier
-ON Ingredient.defaultSupplier=Supplier.id;
-
--- List Ingredients with Default Supplier (By id)
-SELECT id, name, category
-FROM Ingredient
-WHERE defaultSupplier = <SUPPLIER ID>;
-
--- List Ingredients with Default Supplier (By name)
-SELECT id, name, category
-FROM Ingredient
-WHERE defaultSupplier in (
-    SELECT id
-    FROM Supplier
-    WHERE name = "<SUPPLIER NAME>");
-
--- Add Supplier
-INSERT INTO (name)
-VALUES("<SUPPLIER NAME>");
