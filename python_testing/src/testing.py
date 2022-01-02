@@ -50,7 +50,7 @@ class Database:
             password=password,
             database=database
         )
-        self.cursor = self.db.cursor
+        self.cursor = self.db.cursor()
     def get_suppliers(self):
         self.cursor.execute("SELECT id, name FROM Supplier;")
         return self.cursor.fetchall()
@@ -87,20 +87,25 @@ def list_suppliers():
     interface.table("Suppliers", ["id", "name"], get_suppliers())
 
 def menu_ingredients():
-    print("Imgredients:")
+    db.list_ingredients()
 
 def menu_suppliers():
     print()
-    list_suppliers()
+    db.list_suppliers()
 
 class Menu:
     def __init__(self):
         return
     def ingredients(self):
-        interface.menu(True, ("List Ingredients", print), ("Select Ingredient", print), ("Add Ingredient", print))
+        interface.menu(True, ("List Ingredients", db.list_ingredients), ("Select Ingredient", self.select_ingredient), ("Add Ingredient", print))
+
+    def select_ingredient(self):
+        db.list_ingredients()
+
 
     def suppliers(self):
         db.list_suppliers()
+
 
 menu = Menu()
 interface.menu(True, ("Databases", print), ("Ingredients", menu.ingredients), ("Suppliers",menu.suppliers), ("Recipes",print))
