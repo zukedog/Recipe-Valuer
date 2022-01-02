@@ -43,36 +43,48 @@ class tui:
 interface = tui()
 
 class Database:
-    def __init__(self, host, user, password):
+    def __init__(self, host, user, password, database):
         self.db = mysql.connector.connect(
             host=host,
             user=user,
             password=password,
-            database="TestDB"
+            database=database
         )
+        self.cursor = self.db.cursor
+    def get_suppliers(self):
+        self.cursor.execute("SELECT id, name FROM Supplier;")
+        return self.cursor.fetchall()
+
+    def get_ingredients(self):
+        self.cursor.execute('SELECT Ingredient.id, Ingredient.name, Category.name AS "categoryName", Supplier.name AS "defaultSupplierName" FROM Ingredient LEFT OUTER JOIN Supplier ON Ingredient.defaultSupplier=Supplier.id LEFT OUTER JOIN Category ON Ingredient.categoryId=Category.id')
+        return self.cursor.fetchall()
+
+    def list_suppliers(self):
+        interface.table("Suppliers", ["id", "name"], self.get_suppliers())
+
+    def list_ingredients(self):
+        interface.table("Ingredients", ["id", "name", "category", "defaultSupplier"], self.get_ingredients())
+
+
+print("\u001b[2J")
 print("Getting Environment Variables")
 DATABASE_HOST = environ.get("DATABASE_HOST")
 DATABASE_USER = environ.get("DATABASE_USER")
 DATABASE_PASSWORD = environ.get("DATABASE_PASSWORD")
 DATABASE_NAME = environ.get("DATABASE_NAME")
-print('CONNECTING TO DATABASE')
-db = mysql.connector.connect(
-    host=DATABASE_HOST,
-    user=DATABASE_USER,
-    password=DATABASE_PASSWORD,
-    database=DATABASE_NAME
-)
-print("CONNECTED")
-cursor = db.cursor()
 
-def get_suppliers():
-    cursor.execute("SELECT id, name FROM Supplier;")
-    return cursor.fetchall()
+
+
+print('CONNECTING TO DATABASE')
+
+db = Database(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME)
+print("CONNECTED")
+
+
+
 
 def list_suppliers():
     interface.table("Suppliers", ["id", "name"], get_suppliers())
-    #for id, name in get_suppliers():
-        #print(f'{id}) {name}')
 
 def menu_ingredients():
     print("Imgredients:")
@@ -81,5 +93,14 @@ def menu_suppliers():
     print()
     list_suppliers()
 
+class Menu:
+    def __init__(self):
+        return
+    def ingredients(self):
+        interface.menu(True, ("List Ingredients", print), ("Select Ingredient", print), ("Add Ingredient", print))
 
-interface.menu(True, ("Databases", print), ("Ingredients",print), ("Suppliers",menu_suppliers), ("Recipes",print))
+    def suppliers(self):
+        db.list_suppliers()
+
+menu = Menu()
+interface.menu(True, ("Databases", print), ("Ingredients", menu.ingredients), ("Suppliers",menu.suppliers), ("Recipes",print))
