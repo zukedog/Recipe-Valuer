@@ -1,0 +1,19 @@
+body{
+    margin: 0px;
+    display: flex;
+    width: 100vw;
+    flex-direction: column;
+}
+#header{
+    width:100%;
+    background-color: gray;
+    height: 100px;
+}
+
+#box{
+}
+
+#content{
+    margin-left: 10%;
+    margin-right: 10%;
+}
