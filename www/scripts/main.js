@@ -28,60 +28,63 @@ var treeData = [
     {name:"Sugar", qty:"3", unit:"kg", costPerUnit: 10}
 ]},
 {name:"Sponge", qty:"100", unit:"kg", costPerUnit: 10, data:[
-    {name:"Flour", qty:"10", unit:"kg", costPerUnit: 10},
+    {name:"Super Fresh and Amazing Flour", qty:"10", unit:"kg", costPerUnit: 10},
     {name:"Water", qty:"10", unit:"L", costPerUnit: 10},
     {name:"Egg", qty:"2", unit:"kg", costPerUnit: 10},
     {name:"Sugar", qty:"5", unit:"kg", costPerUnit: 10}
 ]}
 ]
 
-grid = webix.ui({
-  container: "box",
-  view:"datatable",
-  //autoConfig:true,
-  columns:[
-  {id:"name", header:["Name",{content:"textFilter"}], width: 200, editor:"text", sort:"string"},
-  {id:"category", header:["Category",{content:"selectFilter"}], width: 150, editor:"combo", sort:"string", options:["Ingredient", "Wage", "Packaging"]},
-  {id:"defaultSupplier", header:"Default Supplier", adjust:true, sort:"string"},
-  {id:"purchaseQty", header:"Purch Qty", width: 100, sort:"int"},
-  {id:"purchaseUnit", header:"Purch Unit", width: 100, sort:"int"},
-  {id:"costPerUnit", header:"$/Default Unit", width: 100, sort:"int"},
-  {id:"defaultUnit", header:"Default Unit", width: 150, sort:"string"},
-  {id:"supplierList", header:"Suppliers", width: 300},
-  {id:"bestPrice", header:"Cheapest Price", width: 150, sort:"int"}
-],
-  resizeColumn:true,
-  editable: true,
-  autowidth:true,
-  data:grid_data,
-  autoheight: true
-});
-
-
-tree = webix.ui({
-    autoheight: true,
-    drag: "order",
-    autowidth:true,
-    editable: true,
-    container: "tree",
-    autoheight: true,
-    view:"treetable",
-
+document.addEventListener('DOMContentLoaded', function(event) {
+    grid = webix.ui({
+    container: "box",
+    view:"datatable",
+    //autoConfig:true,
     columns:[
-        { id:"name", header:"Component Name", editor: "combo", template:"{common.treetable()} #name#", width: 300 },
-        { id:"qty", header:"Qty", width:100, editor:"text", template:"#qty# #unit#"},
-        { id:"unit", header:"Unit", width:100 },
-        { id:"costPerUnit", header:"$/Unit", minWidth: 100, adjust:true, template:"$#costPerUnit#/#unit#"},
-        { id:"cost", header:"Cost", width: 100, math:"[$r,:1]*[$r,:3]", template:"$#cost#"}
+    {id:"name", header:["Name",{content:"textFilter"}], adjust:true, editor:"text", sort:"string"},
+    {id:"category", header:["Category",{content:"selectFilter"}], adjust:true, editor:"combo", sort:"string", options:["Ingredient", "Wage", "Packaging"]},
+    {id:"defaultSupplier", header:"Default Supplier", adjust:true, sort:"string"},
+    {id:"purchaseQty", header:"Purch Qty", adjust:true, sort:"int"},
+    {id:"purchaseUnit", header:"Purch Unit", adjust:true, sort:"int"},
+    {id:"costPerUnit", header:"$/Default Unit", adjust:true, sort:"int"},
+    {id:"defaultUnit", header:"Default Unit", adjust:true, sort:"string"},
+    {id:"supplierList", header:"Suppliers", adjust:true},
+    {id:"bestPrice", header:"Cheapest Price", adjust:true, sort:"int"}
     ],
-    math:true,
-    data: treeData //dataset, variable or path
+    resizeColumn:true,
+    editable: true,
+    autowidth:true,
+    data:grid_data,
+    autoheight: true
+    });
+
+
+    tree = webix.ui({
+        autoheight: true,
+        drag: "order",
+        autowidth:true,
+        editable: true,
+        container: "tree",
+        autoheight: true,
+        view:"treetable",
+
+        columns:[
+            { id:"name", header:"Component Name", minWidth:"300", template:"{common.treetable()} #name#", adjust:true },
+            { id:"qty", header:"Qty", adjust:true, editor:"text", template:"#qty# #unit#"},
+            { id:"unit", header:"Unit", adjust:true },
+            { id:"costPerUnit", header:"$/Unit", adjust:true, template:"$#costPerUnit#/#unit#"},
+            { id:"cost", header:"Cost", adjust:true, math:"[$r,:1]*[$r,:3]", template:"$#cost#"}
+        ],
+        math:true,
+        data: treeData //dataset, variable or path
+    })
+
+    tree.attachEvent("onBeforeDrag", function(context, ev){
+        return this.getItem(context.start).$level == 1; // Only allow top level dragging
+    });
+
+    tree.attachEvent("onBeforeDrop", function(context, ev){
+        return context.parent==0;
+    });
+
 })
-
-tree.attachEvent("onBeforeDrag", function(context, ev){
-    return this.getItem(context.start).$level == 1; // Only allow top level dragging
-});
-
-tree.attachEvent("onBeforeDrop", function(context, ev){
-    return context.parent==0;
-});

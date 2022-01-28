@@ -6,10 +6,20 @@
         <link rel="stylesheet" href="libraries/webix/codebase/webix.min.css">
         <link rel="stylesheet" href="styles/style.css">
         <script src="libraries/webix/codebase/webix.min.js"></script>
+        <script src="scripts/main.js"></script>
     </head>
-    <body>
-    <div id="header">
+    <body class=vflex>
+    <div id="header" class="hflex">
         <img src="assets/bread-slice.svg" height=100% />
+        <div class="vflex">
+            <h1 class="title">Recipe Valuer</h1>
+            <div id="navbar" class="hflex">
+                <div class="headerButton">Ingredients</div>
+                <div class="headerButton">Suppliers</div>
+                <div class="headerButton">Recipes</div>
+                <div class="headerButton">Settings</div>
+            </div>
+        </div>
     </div>
     <div id="content">
         <h1>Ingredients</h1>
@@ -23,6 +33,5 @@
     <div id="footer"></div>
 
 
-        <script src="scripts/main.js"></script>
     </body>
 </html>
