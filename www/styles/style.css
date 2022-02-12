@@ -58,3 +58,10 @@ body{
 .title{
     margin-left: 15px;
 }
+
+input{
+    display: none;
+}
+input:checked{
+    display: block;
+}
